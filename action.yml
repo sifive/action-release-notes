@@ -3,6 +3,9 @@
 name: 'Create Release Notes'
 description: 'Create Markdown-formatted release notes automatically'
 inputs:
+  project-name:
+    description: 'The name of the project to create notes for'  
+    requried: true
   release:
     description: 'The version of the release to create notes for'
     required: true

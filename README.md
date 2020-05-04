@@ -11,6 +11,10 @@ A GitHub Action to generate Markdown-formatted release notes automatically for a
 If the version string matches an existing tag, that tag will be used. If no tag exists, this action assumes
 that the current HEAD commit corresponds to the version.
 
+### `project-name`
+
+**REQUIRED** The name of the project
+
 ### `output-file`
 
 **OPTIONAL** A path to write the release notes to.
