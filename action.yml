@@ -19,5 +19,6 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.project-name }}
     - ${{ inputs.release }}
     - ${{ inputs.output-file }}
