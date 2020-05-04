@@ -10,4 +10,4 @@ COPY . /action-release-notes
 
 RUN python3 -m pip install -r /action-release-notes/requirements.txt
 
-ENTRYPOINT python3 /action-release-notes/create-release-notes.py
+ENTRYPOINT ["entrypoint.sh"]
