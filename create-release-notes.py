@@ -106,9 +106,7 @@ def main(argv):
         with open(output_path, 'w') as output_file:
             output_file.write(release_notes)
 
-    release_notes.replace("\n", "%0A")
-
-    print("::set-output name=release-notes::{}".format(release_notes))
+    print("::set-output name=release-notes::{}".format(release_notes.replace('\n', '%0A')))
 
 
 if __name__ == '__main__':
