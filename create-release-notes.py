@@ -85,10 +85,10 @@ def main(argv):
     release_commit = get_release_commit(repo, release)
     last_release, last_release_commit = get_last_release(repo, release_commit)
 
-    num_commits = repo.git.rev_list("--count", "{}..{}".format(last_release_commit, release))
-    stats = repo.git.diff("--shortstat", last_release_commit, release).strip()
-    authors = [author.split('\t')[1] for author in repo.git.shortlog("-s", "-n", "--no-merges", "{}..{}".format(last_release_commit, release)).split('\n')]
-    merges = repo.git.log("--merges", "--pretty=format:\"%h %b\"", "{}..{}".format(last_release_commit, release)).split('\n')
+    num_commits = repo.git.rev_list("--count", "{}..{}".format(last_release_commit, release_commit))
+    stats = repo.git.diff("--shortstat", last_release_commit, release_commit).strip()
+    authors = [author.split('\t')[1] for author in repo.git.shortlog("-s", "-n", "--no-merges", "{}..{}".format(last_release_commit, release_commit)).split('\n')]
+    merges = repo.git.log("--merges", "--pretty=format:\"%h %b\"", "{}..{}".format(last_release_commit, release_commit)).split('\n')
 
     values = {
         'project_name': project_name,
