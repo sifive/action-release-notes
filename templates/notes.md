@@ -10,5 +10,5 @@
 
 ## Merge History
 {% for merge in merges %}
-{{ merge.shorthash }} {{ merge.description }}
+{{ merge }}
 {% endfor %}

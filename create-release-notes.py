@@ -44,16 +44,19 @@ def get_release_commit(repo, release_tag):
     return repo.head.commit
 
 
-def merge_base_distance(repo, current_commit, past_commit):
+def get_merge_base(repo, current_commit, past_commit):
     merge_bases = repo.merge_base(current_commit, past_commit)
     if len(merge_bases) == 0:
+        return ""
+    return merge_bases[0]
+
+
+def merge_base_distance(repo, current_commit, past_commit):
+    merge_base = get_merge_base(repo, current_commit, past_commit)
+    if merge_base == "":
         return 1000000000
-    merge_base = merge_bases[0]
 
-    if merge_base == current_commit:
-        return 0
-
-    return 1 + min([merge_base_distance(repo, parent, past_commit) for parent in current_commit.parents])
+    return int(repo.git.rev_list("--count", "{}..{}".format(merge_base, current_commit)))
 
 
 def get_oldest_commit(commit):
@@ -73,8 +76,9 @@ def get_last_release(repo, release_commit):
     past_tags.sort(key=lambda tag: merge_base_distance(repo, release_commit, tag.commit))
 
     closest_tag = past_tags[0]
+    print("Last release tag: {}".format(closest_tag))
 
-    return closest_tag.name, closest_tag.commit
+    return closest_tag.name, get_merge_base(repo, release_commit, closest_tag.commit)
 
 
 def main(argv):
@@ -85,10 +89,12 @@ def main(argv):
     release_commit = get_release_commit(repo, release)
     last_release, last_release_commit = get_last_release(repo, release_commit)
 
+    print("last_release_commit: {}".format(last_release_commit))
+
     num_commits = repo.git.rev_list("--count", "{}..{}".format(last_release_commit, release_commit))
     stats = repo.git.diff("--shortstat", last_release_commit, release_commit).strip()
     authors = [author.split('\t')[1] for author in repo.git.shortlog("-s", "-n", "--no-merges", "{}..{}".format(last_release_commit, release_commit)).split('\n')]
-    merges = repo.git.log("--merges", "--pretty=format:\"%h %b\"", "{}..{}".format(last_release_commit, release_commit)).split('\n')
+    merges = repo.git.log("--merges", "--pretty=format:%h %b", "{}..{}".format(last_release_commit, release_commit)).split('\n')
 
     values = {
         'project_name': project_name,
