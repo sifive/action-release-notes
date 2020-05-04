@@ -44,8 +44,31 @@ def get_release_commit(repo, release_tag):
     return repo.head.commit
 
 
+def merge_base_distance(repo, current_commit, past_commit):
+    merge_bases = repo.merge_base(current_commit, past_commit)
+    if len(merge_bases) == 0:
+        return 1000000000
+    merge_base = merge_bases[0]
+
+    if merge_base == current_commit:
+        return 0
+
+    return 1 + min([merge_base_distance(repo, parent, past_commit) for parent in current_commit.parents])
+
+
 def get_last_release(repo, release_commit):
-    pass
+    release_datetime = release_commit.committed_datetime
+    past_tags = [t for t in repo.tags if t.commit.committed_datetime < release_datetime \
+                                         and "rc" not in t.name \
+                                         and "RC" not in t.name]
+    if len(past_tags) == 0:
+        return None, None
+
+    past_tags.sort(key=lambda tag: merge_base_distance(repo, release_commit, tag.commit))
+
+    closest_tag = past_tags[0]
+
+    return closest_tag.name, closest_tag.commit
 
 
 def main(argv):
@@ -54,10 +77,12 @@ def main(argv):
     repo = get_repo()
     
     release_commit = get_release_commit(repo, release)
+    last_release, last_release_commit = get_last_release(repo, release_commit)
 
     values = {
         'project_name': project_name,
         'release': release,
+        'last_release': last_release
     }
 
     release_notes = get_template().render(values)
@@ -69,6 +94,7 @@ def main(argv):
     release_notes.replace("\n", "%0A")
 
     print("::set-output name=release-notes::{}".format(release_notes))
+
 
 if __name__ == '__main__':
     main(sys.argv)
