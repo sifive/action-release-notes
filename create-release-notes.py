@@ -56,13 +56,19 @@ def merge_base_distance(repo, current_commit, past_commit):
     return 1 + min([merge_base_distance(repo, parent, past_commit) for parent in current_commit.parents])
 
 
+def get_oldest_commit(commit):
+    if len(commit.parents) == 0:
+        return commit
+    return get_oldest_commit(commit.parents[0])
+
+
 def get_last_release(repo, release_commit):
     release_datetime = release_commit.committed_datetime
     past_tags = [t for t in repo.tags if t.commit.committed_datetime < release_datetime \
                                          and "rc" not in t.name \
                                          and "RC" not in t.name]
     if len(past_tags) == 0:
-        return None, None
+        return "the beginning of time", get_oldest_commit(release_commit)
 
     past_tags.sort(key=lambda tag: merge_base_distance(repo, release_commit, tag.commit))
 
@@ -79,10 +85,19 @@ def main(argv):
     release_commit = get_release_commit(repo, release)
     last_release, last_release_commit = get_last_release(repo, release_commit)
 
+    num_commits = repo.git.rev_list("--count", "{}..{}".format(last_release_commit, release))
+    stats = repo.git.diff("--shortstat", last_release_commit, release).strip()
+    authors = [author.split('\t')[1] for author in repo.git.shortlog("-s", "-n", "--no-merges", "{}..{}".format(last_release_commit, release)).split('\n')]
+    merges = repo.git.log("--merges", "--pretty=format:\"%h %b\"", "{}..{}".format(last_release_commit, release)).split('\n')
+
     values = {
         'project_name': project_name,
         'release': release,
-        'last_release': last_release
+        'last_release': last_release,
+        'num_commits': num_commits,
+        'stats': stats,
+        'authors': authors,
+        'merges': merges,
     }
 
     release_notes = get_template().render(values)
