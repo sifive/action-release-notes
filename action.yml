@@ -6,9 +6,6 @@ inputs:
   release:
     description: 'The version of the release to create notes for'
     required: true
-  last-release:
-    description: 'Optional override of the previous release version.'
-    required: false
   output-file:
     description: 'Path to write the release notes to'
     required: false
@@ -20,5 +17,4 @@ runs:
   image: 'Dockerfile'
   args:
     - ${{ inputs.release }}
-    - ${{ inputs.last-release }}
     - ${{ inputs.output-file }}

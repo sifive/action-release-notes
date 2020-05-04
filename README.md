@@ -11,12 +11,6 @@ A GitHub Action to generate Markdown-formatted release notes automatically for a
 If the version string matches an existing tag, that tag will be used. If no tag exists, this action assumes
 that the current HEAD commit corresponds to the version.
 
-### `last-release`
-
-**OPTIONAL** The last version of the project.
-
-`action-release-notes` will attempt to determine the last version of the project. Use this option to manually override the detected last version.
-
 ### `output-file`
 
 **OPTIONAL** A path to write the release notes to.
