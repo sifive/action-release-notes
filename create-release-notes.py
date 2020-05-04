@@ -13,7 +13,7 @@ def parse_args(argv):
 
     project_name = argv[1]
 
-    release = argv[2]
+    release = argv[2].replace('refs/tags/', '')
 
     output_path = None
     if len(argv) >= 4:
