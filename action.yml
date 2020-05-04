@@ -1,0 +1,24 @@
+# Copyright (c) 2020 SiFive Inc.
+# SPDX-License-Identifier: Apache-2.0
+name: 'Create Release Notes'
+description: 'Create Markdown-formatted release notes automatically'
+inputs:
+  release:
+    description: 'The version of the release to create notes for'
+    required: true
+  last-release:
+    description: 'Optional override of the previous release version.'
+    required: false
+  output-file:
+    description: 'Path to write the release notes to'
+    required: false
+outputs:
+  release-notes:
+    description: 'Content of the release notes for use elsewhere in your workflow'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.release }}
+    - ${{ inputs.last-release }}
+    - ${{ inputs.output-file }}
